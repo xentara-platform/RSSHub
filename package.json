@@ -49,6 +49,7 @@
         "start": "cross-env NODE_ENV=production NODE_OPTIONS='--max-http-header-size=32768' node dist/index.mjs",
         "test": "npm run format:check && npm run vitest:coverage",
         "typecheck": "tsc --noEmit",
+        "update-request": "tsx scripts/update-route-request.ts",
         "vercel-build": "npm run build:routes && npm run build:index && tsdown --config ./tsdown-vercel.config.ts",
         "vitest": "cross-env NODE_ENV=test vitest",
         "vitest:coverage": "cross-env NODE_ENV=test vitest --coverage.enabled --reporter=junit",
