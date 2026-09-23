@@ -83,3 +83,4 @@ src
 .env.db
 lib/xentara-routes/
 scratch/
+.env*
