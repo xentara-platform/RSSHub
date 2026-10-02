@@ -30,25 +30,26 @@ async function handler() {
 
     const $ = cheerio.load(html);
 
-    const items = $('.post-item, article, .blog-post')
+    const items = $('.elementor-post')
         .toArray()
         .map((elem) => {
             const item = $(elem);
-            const titleElem = item.find('h2, h3, .post-title, .entry-title').first();
-            const linkElem = item.find('a').first();
-            const pubDateText = item.find('.date, .published, time').first().text().trim();
+            const titleElem = item.find('.elementor-post__title, h3, h2').first();
+            const linkElem = item.find('a.elementor-post__read-more').first();
+            const pubDateText = item.find('.elementor-post-date, .elementor-post__meta-data .elementor-icon-list-text').first().text().trim();
 
             return {
                 title: titleElem.text().trim(),
                 link: linkElem.attr('href') ? new URL(linkElem.attr('href') as string, url).href : '',
                 pubDate: pubDateText ? parseDate(pubDateText) : undefined,
-                description: item.find('.excerpt, .entry-content, .post-excerpt').html() || '',
+                description: item.find('.elementor-post__excerpt').html() || '',
             };
-        });
+        })
+        .filter((item) => item.title && item.link);
 
     return {
         title: 'Sani Car Rental - Blog',
         link: url,
-        item: items.filter((item) => item.title && item.link),
+        item: items,
     };
 }
