@@ -10,5 +10,10 @@
     ],
     "github": {
         "silent": true
+    },
+    "functions": {
+        "src/**/*": {
+            "includeFiles": "node_modules/**/patchright-core/browsers.json"
+        }
     }
 }
