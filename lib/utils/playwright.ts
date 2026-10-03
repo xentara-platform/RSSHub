@@ -8,7 +8,10 @@ import proxy from './proxy';
 
 // Force Vercel NFT to trace browsers.json
 try {
-    require.resolve('patchright-core/browsers.json');
+    const browsersJson = require.resolve('patchright-core/browsers.json');
+    if (process.env.DEBUG_NFT) {
+        logger.debug(browsersJson);
+    }
 } catch {
     // ignore
 }
