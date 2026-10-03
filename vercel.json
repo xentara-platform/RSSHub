@@ -10,16 +10,5 @@
     ],
     "github": {
         "silent": true
-    },
-    "functions": {
-        "src/server.mjs": {
-            "includeFiles": "node_modules/.pnpm/**/patchright-core/browsers.json"
-        },
-        "server.mjs": {
-            "includeFiles": "node_modules/.pnpm/**/patchright-core/browsers.json"
-        },
-        "src/**/*": {
-            "includeFiles": "node_modules/.pnpm/**/patchright-core/browsers.json"
-        }
     }
 }
