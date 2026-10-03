@@ -22,7 +22,7 @@ async function handler() {
     const url = 'https://sani.co.za/blog/';
 
     const { page, destroy } = await getPlaywrightPage(url, {
-        gotoConfig: { waitUntil: 'networkidle' },
+        gotoConfig: { waitUntil: 'domcontentloaded' },
     });
 
     const html = await page.content();
