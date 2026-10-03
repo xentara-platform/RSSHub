@@ -6,6 +6,13 @@ import { config } from '@/config';
 import logger from './logger';
 import proxy from './proxy';
 
+// Force Vercel NFT to trace browsers.json
+try {
+    require.resolve('patchright-core/browsers.json');
+} catch {
+    // ignore
+}
+
 type GotoOptions = Parameters<Page['goto']>[1];
 
 type ProxyState = NonNullable<ReturnType<typeof proxy.getCurrentProxy>>;
