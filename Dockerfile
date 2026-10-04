@@ -20,6 +20,7 @@ COPY ./tsconfig.json /app/
 COPY ./patches /app/patches
 COPY ./pnpm-lock.yaml /app/
 COPY ./package.json /app/
+COPY ./pnpm-workspace.yaml /app/
 
 # Lazy install Chromium to avoid cache miss, only install production dependencies to minimize the image size.
 RUN \
