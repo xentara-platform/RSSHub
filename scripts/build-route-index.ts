@@ -54,6 +54,11 @@ interface RouteData {
     maintainers: string[];
     categories: string[];
     file: string;
+    features?: {
+        requirePuppeteer?: boolean;
+        antiCrawler?: boolean;
+    };
+    executionEngine?: string;
 }
 
 interface ApiRouteData {
@@ -136,6 +141,10 @@ function parseRouteFile(text: string, fileName: string): RouteData | null {
         return null;
     }
 
+    const requirePuppeteer = metaSection.includes('requirePuppeteer: true');
+    const antiCrawler = metaSection.includes('antiCrawler: true');
+    const executionEngine = requirePuppeteer ? 'residential_browser' : 'serverless';
+
     return {
         path: routePath,
         name,
@@ -144,6 +153,11 @@ function parseRouteFile(text: string, fileName: string): RouteData | null {
         maintainers: extractStringArray(metaSection, 'maintainers'),
         categories: extractStringArray(metaSection, 'categories'),
         file: fileName,
+        features: {
+            requirePuppeteer,
+            antiCrawler,
+        },
+        executionEngine,
     };
 }
 

@@ -5,7 +5,8 @@ on:
         branches:
             - production
         paths:
-            - 'lib/routes/sani/**'
+            - 'lib/routes/**'
+            - 'scripts/**'
             - 'docker-compose.yml'
             - 'Dockerfile'
             - 'package.json'

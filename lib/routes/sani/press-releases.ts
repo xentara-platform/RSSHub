@@ -14,7 +14,7 @@ export const route: Route = {
         antiCrawler: true,
     },
     name: 'Press Releases',
-    maintainers: ['your-github-username'],
+    maintainers: ['FrancoBenedetti'],
     handler,
 };
 
