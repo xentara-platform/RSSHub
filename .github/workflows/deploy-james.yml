@@ -1,0 +1,38 @@
+name: Deploy to James (Residential Node)
+
+on:
+    push:
+        branches:
+            - production
+        paths:
+            - 'lib/routes/sani/**'
+            - 'docker-compose.yml'
+            - 'Dockerfile'
+            - 'package.json'
+            - 'pnpm-lock.yaml'
+            - '.github/workflows/deploy-james.yml'
+    workflow_dispatch:
+
+concurrency:
+    group: deploy-james-${{ github.ref_name }}
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        name: Rebuild & Restart RSSHub on James
+        runs-on: [self-hosted, james]
+        timeout-minutes: 15
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Build & Restart RSSHub Container
+              run: |
+                  docker compose build rsshub
+                  docker compose up -d rsshub
+
+            - name: Verify Health Endpoint
+              run: |
+                  sleep 5
+                  curl -f http://localhost:1200/healthz || exit 1
