@@ -32,11 +32,12 @@ const rest = args.slice(1);
 if (!commandOrId || commandOrId === '--help' || commandOrId === '-h') {
     console.log(`
 Usage:
-  npx tsx scripts/update-route-request.ts <request-id> <namespace> <route_path> <example_url> [resolution_notes]
+  npx tsx scripts/update-route-request.ts <request-id> <namespace> <route_path> <example_url> [resolution_notes] [--engine serverless|residential_browser]
   npx tsx scripts/update-route-request.ts --defer <request-id> [reason]
 
 Examples:
-  npx tsx scripts/update-route-request.ts 26ef2858-e9a7-4778-ae9f-47e98e21fb97 automotivelogistics /:category? /automotivelogistics/news "Custom route implemented"
+  npx tsx scripts/update-route-request.ts 26ef2858-e9a7-4778-ae9f-47e98e21fb97 automotivelogistics /:category? /automotivelogistics/news "Custom route implemented" --engine serverless
+  npx tsx scripts/update-route-request.ts 26ef2858-e9a7-4778-ae9f-47e98e21fb97 sani /press-releases /sani/press-releases "Requires residential browser CDP" --engine residential_browser
   npx tsx scripts/update-route-request.ts --defer 26ef2858-e9a7-4778-ae9f-47e98e21fb97 "Requires login credentials"
 `);
     process.exit(0);
@@ -60,6 +61,16 @@ if (commandOrId === '--defer') {
     };
 } else {
     id = commandOrId;
+    let executionEngine = 'serverless';
+    const engineIdx = rest.indexOf('--engine');
+    if (engineIdx !== -1) {
+        const val = rest[engineIdx + 1];
+        if (val === 'residential_browser' || val === 'serverless') {
+            executionEngine = val;
+        }
+        rest.splice(engineIdx, 2);
+    }
+
     const [ns, routePath, exampleUrl, ...notesArr] = rest;
     if (!id || !ns || !routePath || !exampleUrl) {
         console.error('Error: Missing required arguments: <id> <namespace> <route_path> <example_url>');
@@ -71,6 +82,7 @@ if (commandOrId === '--defer') {
         rsshub_namespace: ns,
         rsshub_route_path: routePath,
         rsshub_example_url: exampleUrl,
+        execution_engine: executionEngine,
         resolved_at: new Date().toISOString(),
         resolved_by: 'antigravity-agent',
         resolution_notes: notes,

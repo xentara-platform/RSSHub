@@ -143,8 +143,12 @@ For each entry in `scratch/pending_requests.json`, inspect `target_url`, `instru
     - Test if the site has a native RSS feed (`/feed`, `/rss`, `/atom.xml`).
     - Test if the site is built on WordPress (`/wp-json/wp/v2/posts?_embed=1`). WordPress REST API is **strongly preferred** over scraping HTML.
 
-4. **Evaluate for Deferral**:
-   If the request requires private user authentication, is a closed Facebook group, has an impenetrable Cloudflare Turnstile/Captcha wall, or lacks extractable content, mark it as deferred:
+4. **Assess Execution Engine (Tier 1 Serverless vs. Tier 2 Residential Edge)**:
+    - **Tier 1 (Serverless / Vercel)**: Standard APIs, RSS feeds, WordPress endpoints, and static Cheerio scrapers without bot challenges. Deployable on Vercel. Set `--engine serverless`.
+    - **Tier 2 (Residential Edge / `james`)**: Sites requiring South African residential IP reputation, Cloudflare Turnstile bypass, or client-side rendering (e.g. Elementor, single-page apps). Set `--engine residential_browser`.
+
+5. **Evaluate for Deferral**:
+   Only defer if the request requires private user authentication, is a closed walled-garden (e.g. private Facebook group), or lacks extractable content:
     ```bash
     pnpm update-request --defer <request-id> "Reason for deferral"
     ```
@@ -152,6 +156,28 @@ For each entry in `scratch/pending_requests.json`, inspect `target_url`, `instru
 ---
 
 ### Step 3: Implement the Custom Route
+
+#### Option A: Standard Route (Tier 1 Serverless)
+
+For typical feeds without heavy bot challenges, create `lib/routes/<namespace>/feed.ts` using `ofetch` and `cheerio`.
+
+#### Option B: Browser-Based Route (Tier 2 Residential Edge / `james`)
+
+For sites protected by Cloudflare Turnstile or requiring client-side JS rendering:
+
+1. Ensure the route sets `features: { requirePuppeteer: true, antiCrawler: true }`.
+2. Use RSSHub's `getPlaywrightPage()` connecting over Chrome DevTools Protocol (`PLAYWRIGHT_CDP_ENDPOINT`).
+3. Always use `domcontentloaded` wait strategy:
+    ```typescript
+    const { page, destroy } = await getPlaywrightPage(url, {
+        gotoConfig: { waitUntil: 'domcontentloaded' },
+    });
+    await page.waitForSelector('.target-selector', { timeout: 15000 });
+    const html = await page.content();
+    await destroy();
+    ```
+4. Register the domain in `PROXY_URL_REGEX` on `james` so Playwright automatically routes through Squid residential proxy.
+5. When resolving via `pnpm update-request`, specify `--engine residential_browser`.
 
 Create a new directory: `lib/routes/<namespace>/`
 
