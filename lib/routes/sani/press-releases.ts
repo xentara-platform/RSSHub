@@ -22,11 +22,17 @@ async function handler() {
     const url = 'https://sani.co.za/press-releases/';
 
     const { page, destroy } = await getPlaywrightPage(url, {
-        gotoConfig: { waitUntil: 'domcontentloaded' },
+        gotoConfig: { waitUntil: 'commit' },
     });
 
-    const html = await page.content();
-    await destroy();
+    let html: string;
+    try {
+        await page.waitForFunction(() => !document.title.includes('Just a moment'), null, { timeout: 30000 });
+        await page.waitForSelector('.elementor-post', { state: 'attached', timeout: 15000 });
+        html = await page.content();
+    } finally {
+        await destroy();
+    }
 
     const $ = cheerio.load(html);
 
